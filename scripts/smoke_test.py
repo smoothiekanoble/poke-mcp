@@ -118,6 +118,15 @@ async def run(args: argparse.Namespace) -> int:
     settings = Settings()
     transport = args.url or create_mcp(settings=settings)
     auth = args.api_key if args.url and args.api_key else None
+    print_json(
+        "client_session",
+        {
+            "mode": "remote" if args.url else "in_process",
+            "url": args.url,
+            "api_key_provided": bool(args.api_key),
+            "auth_header": "Authorization: Bearer <redacted>" if auth else None,
+        },
+    )
 
     async with Client(transport, auth=auth) as client:
         tools = await client.list_tools()

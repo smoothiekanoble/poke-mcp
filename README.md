@@ -54,7 +54,13 @@ POKE_MCP_API_KEY=
 
 `SUPABASE_SERVICE_ROLE_KEY` must stay server-side. Every operation in this repo is scoped to `DANIEL_USER_ID`.
 
-`POKE_MCP_API_KEY` is a reserved config surface and is reported by `health()`, but this MVP does not yet enforce an API-key header at the FastMCP HTTP transport. Do not treat it as endpoint protection until auth is wired or the deployment host/proxy enforces it.
+When `POKE_MCP_API_KEY` is set, the MCP endpoint requires FastMCP bearer auth:
+
+```text
+Authorization: Bearer <POKE_MCP_API_KEY>
+```
+
+The `/health` HTTP route remains public and secret-safe for platform health checks.
 
 ## Local Setup
 
@@ -149,7 +155,7 @@ Terminate TLS at the hosting provider and connect Poke to:
 https://your-public-host.example.com/mcp
 ```
 
-Do not expose the endpoint publicly without either FastMCP transport auth or a host/proxy rule that enforces a secret header. The current `POKE_MCP_API_KEY` helper is not transport enforcement.
+Do not expose the endpoint publicly without setting `POKE_MCP_API_KEY` or using a host/proxy rule that enforces equivalent bearer auth.
 
 ### Render
 
@@ -226,9 +232,9 @@ https://your-public-host.example.com/mcp
 
 Auth behavior in this MVP:
 
-- No API-key request header is enforced by the app yet.
-- `scripts/smoke_test.py --api-key` sends `Authorization: Bearer <secret>` using FastMCP's HTTP `auth=` support.
-- If the host/proxy enforces bearer auth, configure that at the deployment layer and store the value outside git.
+- If `POKE_MCP_API_KEY` is set on the server, `/mcp` requires `Authorization: Bearer <POKE_MCP_API_KEY>`.
+- `scripts/smoke_test.py --api-key` sends that exact header using FastMCP's HTTP `auth=` support.
+- Poke should be configured to send `Authorization: Bearer <POKE_MCP_API_KEY>` when connecting to the MCP URL.
 - `health()` reports whether `POKE_MCP_API_KEY` is configured, but it does not reveal the key.
 
 Example Poke prompts:

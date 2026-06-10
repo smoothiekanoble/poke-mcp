@@ -48,5 +48,6 @@ For remote protected smoke tests, use `.\.venv\Scripts\python scripts\smoke_test
 - The server must bind to `MCP_HOST=0.0.0.0` on public hosts.
 - The server uses `MCP_PORT`, or platform `PORT` when `MCP_PORT` is absent.
 - The MCP endpoint must stay at `MCP_PATH` unless Daniel changes the Poke integration URL.
+- When `POKE_MCP_API_KEY` is set, `/mcp` requires `Authorization: Bearer <POKE_MCP_API_KEY>`.
 - `/health` is for platform health checks and must stay secret-safe.
 - Do not put Supabase secrets in deployment config files; set them in the host secret/env UI.
