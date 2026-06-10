@@ -201,13 +201,19 @@ After a deployment finishes:
 .\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp
 ```
 
+If the remote MCP endpoint requires bearer auth, pass the key through FastMCP's HTTP auth path:
+
+```powershell
+.\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp --api-key "<secret>"
+```
+
 5. Confirm the smoke test lists tools and returns today's habit dashboard.
 6. Connect Poke to `https://your-public-host.example.com/mcp`.
 7. From Poke, ask "What habits do I have left today?"
 8. Only after read-only checks pass, intentionally test writes with a low-risk habit:
 
 ```powershell
-.\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp --write --habit "Creatine"
+.\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp --api-key "<secret>" --write --habit "Creatine"
 ```
 
 ## Connect From Poke
@@ -221,7 +227,8 @@ https://your-public-host.example.com/mcp
 Auth behavior in this MVP:
 
 - No API-key request header is enforced by the app yet.
-- If the host/proxy enforces a header, configure that at the deployment layer and store the value outside git.
+- `scripts/smoke_test.py --api-key` sends `Authorization: Bearer <secret>` using FastMCP's HTTP `auth=` support.
+- If the host/proxy enforces bearer auth, configure that at the deployment layer and store the value outside git.
 - `health()` reports whether `POKE_MCP_API_KEY` is configured, but it does not reveal the key.
 
 Example Poke prompts:

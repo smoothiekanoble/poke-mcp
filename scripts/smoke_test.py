@@ -42,6 +42,13 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--api-key",
+        help=(
+            "Bearer token to send with remote --url smoke tests. FastMCP sends this "
+            "as Authorization: Bearer <token>. Only valid with --url."
+        ),
+    )
+    parser.add_argument(
         "--write",
         action="store_true",
         help=(
@@ -104,11 +111,15 @@ async def run(args: argparse.Namespace) -> int:
     if args.write and not args.habit:
         print("--write requires --habit \"Habit title\".", file=sys.stderr)
         return 2
+    if args.api_key and not args.url:
+        print("--api-key is only valid with --url remote smoke tests.", file=sys.stderr)
+        return 2
 
     settings = Settings()
     transport = args.url or create_mcp(settings=settings)
+    auth = args.api_key if args.url and args.api_key else None
 
-    async with Client(transport) as client:
+    async with Client(transport, auth=auth) as client:
         tools = await client.list_tools()
         tool_names = {tool.name for tool in tools}
         missing = sorted(EXPECTED_TOOLS - tool_names)

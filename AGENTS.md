@@ -40,6 +40,7 @@ python -m venv .venv
 ```
 
 Use `.\.venv\Scripts\python scripts\smoke_test.py --write --habit "Habit title"` only when Daniel explicitly wants a real Supabase write smoke test.
+For remote protected smoke tests, use `.\.venv\Scripts\python scripts\smoke_test.py --url https://host.example.com/mcp --api-key "<secret>"`; this sends `Authorization: Bearer <secret>` through FastMCP's HTTP client auth.
 
 ## Deployment Notes
 
