@@ -57,3 +57,11 @@ def test_config_accepts_platform_port(monkeypatch) -> None:
     settings = Settings(_env_file=None)
 
     assert settings.mcp_port == 9001
+
+
+def test_config_loads_default_timezone(monkeypatch) -> None:
+    monkeypatch.delenv("APP_TIMEZONE", raising=False)
+
+    settings = Settings(_env_file=None)
+
+    assert settings.timezone().key == "America/Chicago"

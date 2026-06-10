@@ -114,7 +114,19 @@ Write mode calls both `complete_habit()` and `uncomplete_habit()` against real S
 
 ## Deploy To HTTPS
 
-Use a host that can run Python 3.12 and expose HTTPS, such as Render, Fly.io, or Railway.
+Use a host that can run Python 3.12 and expose HTTPS, such as Render, Railway, or Fly.io. This repo includes:
+
+- `Dockerfile`: production container image.
+- `render.yaml`: Render Blueprint for a Docker web service.
+- `railway.toml`: Railway config-as-code using the Dockerfile.
+- `fly.toml`: Fly app config using the Dockerfile.
+
+Runtime behavior:
+
+- The server binds `MCP_HOST`, default `127.0.0.1`.
+- The server uses `MCP_PORT`; if `MCP_PORT` is absent, platform `PORT` is accepted.
+- The MCP endpoint is mounted at `MCP_PATH`, default `/mcp`.
+- `/health` is a plain HTTP health route for deployment checks. It is secret-safe and returns the same config booleans as the `health()` MCP tool.
 
 Recommended deployment shape:
 
@@ -138,6 +150,65 @@ https://your-public-host.example.com/mcp
 ```
 
 Do not expose the endpoint publicly without either FastMCP transport auth or a host/proxy rule that enforces a secret header. The current `POKE_MCP_API_KEY` helper is not transport enforcement.
+
+### Render
+
+Use `render.yaml` as a Blueprint, or create a Docker web service from the GitHub repo.
+
+Set these secret/env values in Render:
+
+```text
+APP_ENV=production
+APP_TIMEZONE=America/Chicago
+MCP_HOST=0.0.0.0
+MCP_PATH=/mcp
+SUPABASE_URL=<project url>
+SUPABASE_SERVICE_ROLE_KEY=<server-side secret>
+DANIEL_USER_ID=<Daniel's auth.users id>
+```
+
+Render provides `PORT`, so `MCP_PORT` is optional. Health check path: `/health`.
+
+### Railway
+
+Railway will use `railway.toml` and the Dockerfile. Set the same production env vars as Render. Railway provides `PORT`, so `MCP_PORT` is optional. After deploy, create or use the public Railway domain and use:
+
+```text
+https://your-railway-domain.up.railway.app/mcp
+```
+
+### Fly.io
+
+Edit `fly.toml` if the app name `poke-mcp` is unavailable, then set secrets and deploy:
+
+```powershell
+fly secrets set SUPABASE_URL="<project url>" SUPABASE_SERVICE_ROLE_KEY="<server-side secret>" DANIEL_USER_ID="<Daniel's auth.users id>"
+fly deploy
+```
+
+`fly.toml` sets `MCP_PORT=8080` and maps Fly's public HTTPS service to internal port `8080`. Health check path: `/health`.
+
+## Deployed Smoke-Test Checklist
+
+After a deployment finishes:
+
+1. Confirm logs show the server starting on `0.0.0.0` and the expected port.
+2. Open `https://your-public-host.example.com/health`.
+3. Confirm the health payload has `status: "ok"`, `supabase_configured: true`, and no secret values.
+4. Run a read-only remote MCP smoke test:
+
+```powershell
+.\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp
+```
+
+5. Confirm the smoke test lists tools and returns today's habit dashboard.
+6. Connect Poke to `https://your-public-host.example.com/mcp`.
+7. From Poke, ask "What habits do I have left today?"
+8. Only after read-only checks pass, intentionally test writes with a low-risk habit:
+
+```powershell
+.\.venv\Scripts\python scripts\smoke_test.py --url https://your-public-host.example.com/mcp --write --habit "Creatine"
+```
 
 ## Connect From Poke
 

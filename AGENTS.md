@@ -40,3 +40,12 @@ python -m venv .venv
 ```
 
 Use `.\.venv\Scripts\python scripts\smoke_test.py --write --habit "Habit title"` only when Daniel explicitly wants a real Supabase write smoke test.
+
+## Deployment Notes
+
+- Deployment files are `Dockerfile`, `render.yaml`, `railway.toml`, and `fly.toml`.
+- The server must bind to `MCP_HOST=0.0.0.0` on public hosts.
+- The server uses `MCP_PORT`, or platform `PORT` when `MCP_PORT` is absent.
+- The MCP endpoint must stay at `MCP_PATH` unless Daniel changes the Poke integration URL.
+- `/health` is for platform health checks and must stay secret-safe.
+- Do not put Supabase secrets in deployment config files; set them in the host secret/env UI.

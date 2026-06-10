@@ -1,4 +1,4 @@
-"""Manual smoke test for the local Poke MCP server.
+"""Manual smoke test for the local or deployed Poke MCP server.
 
 Read-only by default. Real Supabase writes require --write and --habit.
 """
@@ -32,6 +32,14 @@ def parse_args() -> argparse.Namespace:
             "Run a local MCP smoke test. Read-only unless --write is supplied. "
             "Write mode updates today's habit_logs through real Supabase."
         )
+    )
+    parser.add_argument(
+        "--url",
+        help=(
+            "Public or local MCP URL to smoke test over HTTP, for example "
+            "https://your-host.example.com/mcp. If omitted, the script uses "
+            "an in-process local FastMCP client."
+        ),
     )
     parser.add_argument(
         "--write",
@@ -98,9 +106,9 @@ async def run(args: argparse.Namespace) -> int:
         return 2
 
     settings = Settings()
-    mcp = create_mcp(settings=settings)
+    transport = args.url or create_mcp(settings=settings)
 
-    async with Client(mcp) as client:
+    async with Client(transport) as client:
         tools = await client.list_tools()
         tool_names = {tool.name for tool in tools}
         missing = sorted(EXPECTED_TOOLS - tool_names)
@@ -109,15 +117,21 @@ async def run(args: argparse.Namespace) -> int:
             print_json("missing_expected_tools", missing)
             return 1
 
-        print_json("health", await call_tool(client, "health"))
+        health = await call_tool(client, "health")
+        print_json("health", health)
 
-        if not settings.supabase_configured:
+        supabase_available = bool(health.get("supabase_configured"))
+        if not args.url and not settings.supabase_configured:
+            supabase_available = False
+
+        if not supabase_available:
             print_json(
                 "supabase_skipped",
                 {
                     "reason": (
-                        "SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and DANIEL_USER_ID "
-                        "must be present to call real HabitTracker data."
+                        "The target server reports Supabase is not fully configured. "
+                        "Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and DANIEL_USER_ID "
+                        "on that target to call real HabitTracker data."
                     ),
                     "write_requested": args.write,
                 },

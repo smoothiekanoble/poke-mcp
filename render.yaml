@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: poke-mcp
+    runtime: docker
+    repo: https://github.com/smoothiekanoble/poke-mcp
+    branch: feat/initial-mcp-server
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_TIMEZONE
+        value: America/Chicago
+      - key: MCP_HOST
+        value: 0.0.0.0
+      - key: MCP_PATH
+        value: /mcp
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: DANIEL_USER_ID
+        sync: false
+      - key: POKE_MCP_API_KEY
+        sync: false

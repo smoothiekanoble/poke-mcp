@@ -6,6 +6,8 @@ from collections.abc import Callable
 from typing import Any
 
 from fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from poke_mcp.clients.supabase_client import build_supabase_client
 from poke_mcp.config import Settings, get_settings
@@ -14,7 +16,7 @@ from poke_mcp.services.habittracker_service import HabitTrackerService
 from poke_mcp.tools.blocked_tools import register_blocked_tools
 from poke_mcp.tools.dashboard_tools import register_dashboard_tools
 from poke_mcp.tools.habittracker_tools import register_habittracker_tools
-from poke_mcp.tools.health_tools import register_health_tools
+from poke_mcp.tools.health_tools import build_health_payload, register_health_tools
 
 
 def create_mcp(
@@ -42,6 +44,13 @@ def create_mcp(
     register_habittracker_tools(mcp, habittracker_service_factory)
     register_dashboard_tools(mcp, dashboard_service_factory)
     register_blocked_tools(mcp)
+
+    @mcp.custom_route("/health", methods=["GET"])
+    async def http_health(request: Request) -> JSONResponse:
+        """HTTP health check for deployment platforms."""
+        _ = request
+        return JSONResponse(build_health_payload(resolved_settings))
+
     return mcp
 
 
