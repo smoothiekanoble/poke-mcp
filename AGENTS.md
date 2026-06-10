@@ -35,6 +35,8 @@ python -m venv .venv
 .\.venv\Scripts\python -m pip install -e ".[dev]"
 .\.venv\Scripts\python -m pytest
 .\.venv\Scripts\python -m ruff check .
+.\.venv\Scripts\python scripts\smoke_test.py
 .\.venv\Scripts\python -m poke_mcp.server
 ```
 
+Use `.\.venv\Scripts\python scripts\smoke_test.py --write --habit "Habit title"` only when Daniel explicitly wants a real Supabase write smoke test.

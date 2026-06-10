@@ -5,13 +5,16 @@ from __future__ import annotations
 from functools import lru_cache
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     app_env: str = Field(default="development", alias="APP_ENV")
     app_timezone: str = Field(default="America/Chicago", alias="APP_TIMEZONE")
+    mcp_host: str = Field(default="127.0.0.1", alias="MCP_HOST")
+    mcp_port: int = Field(default=8000, validation_alias=AliasChoices("MCP_PORT", "PORT"))
+    mcp_path: str = Field(default="/mcp", alias="MCP_PATH")
     supabase_url: str | None = Field(default=None, alias="SUPABASE_URL")
     supabase_service_role_key: str | None = Field(
         default=None,
@@ -50,4 +53,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

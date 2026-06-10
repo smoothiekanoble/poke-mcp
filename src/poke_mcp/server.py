@@ -49,9 +49,14 @@ mcp = create_mcp()
 
 
 def main() -> None:
-    mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp")
+    settings = get_settings()
+    mcp.run(
+        transport="http",
+        host=settings.mcp_host,
+        port=settings.mcp_port,
+        path=settings.mcp_path,
+    )
 
 
 if __name__ == "__main__":
     main()
-
