@@ -1,0 +1,13 @@
+# .github/workflows/deploy-render.yml
+name: Deploy to Render
+
+on:
+  push:
+    branches: [feat/initial-mcp-server]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: curl -fsS "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
