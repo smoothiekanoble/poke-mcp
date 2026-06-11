@@ -45,13 +45,49 @@ Migration found:
 
 The table has a unique constraint on `(habit_id, date)`, which supports idempotent upserts.
 
+### `public.daily_metrics`
+
+Daily summarized imported metrics (MedM body-weight import). Verified against live
+Supabase on 2026-06-10; no migration file exists in the HabitTracker repo.
+
+Columns used by `/poke` (read-only):
+
+- `user_id`
+- `metric_date` (date, `YYYY-MM-DD`)
+- `metric_type` (e.g. `body_weight`)
+- `value` (numeric)
+- `unit` (e.g. `lb`)
+- `source` (e.g. `medm_health`)
+
+Other known columns: `id`, `source_detail` (jsonb), `created_at`, `updated_at`.
+
+### `public.metric_events`
+
+Event-level imported measurements. Verified against live Supabase on 2026-06-10.
+
+Columns used by `/poke` (read-only):
+
+- `user_id`
+- `occurred_at` (timestamptz)
+- `metric_date`
+- `metric_type`
+- `value`
+- `unit`
+- `source`
+- `source_detail` (text, device name)
+
+Other known columns: `id`, `source_record_id`, `raw_metadata` (jsonb), `created_at`,
+`updated_at`.
+
+`/poke` metric tools query `daily_metrics` for summaries/history and only touch
+`metric_events` for latest raw event details. Both tables are read-only from `/poke`.
+
 ## Missing Schema
 
 No HabitTracker tables were found for:
 
 - tasks
 - daily check-ins
-- bodyweight
 - sleep
 - readiness
 - health logs

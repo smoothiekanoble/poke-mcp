@@ -27,6 +27,7 @@ class FakeQuery:
         self._payload: dict[str, Any] | None = None
         self._on_conflict: str | None = None
         self._order_by: tuple[str, bool] | None = None
+        self._limit: int | None = None
 
     def select(self, columns: str = "*") -> FakeQuery:
         _ = columns
@@ -41,8 +42,20 @@ class FakeQuery:
         self._filters.append(("in", field, list(values)))
         return self
 
+    def gte(self, field: str, value: Any) -> FakeQuery:
+        self._filters.append(("gte", field, value))
+        return self
+
+    def lte(self, field: str, value: Any) -> FakeQuery:
+        self._filters.append(("lte", field, value))
+        return self
+
     def order(self, field: str, *, desc: bool = False) -> FakeQuery:
         self._order_by = (field, desc)
+        return self
+
+    def limit(self, count: int) -> FakeQuery:
+        self._limit = count
         return self
 
     def upsert(
@@ -69,9 +82,15 @@ class FakeQuery:
             elif kind == "in":
                 allowed = {str(item) for item in value}
                 rows = [row for row in rows if str(row.get(field)) in allowed]
+            elif kind == "gte":
+                rows = [row for row in rows if str(row.get(field) or "") >= str(value)]
+            elif kind == "lte":
+                rows = [row for row in rows if str(row.get(field) or "") <= str(value)]
         if self._order_by:
             field, desc = self._order_by
             rows.sort(key=lambda row: str(row.get(field) or ""), reverse=desc)
+        if self._limit is not None:
+            rows = rows[: self._limit]
         self._supabase.operations.append(
             {
                 "action": "select",

@@ -10,4 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render deploy
-        run: curl -fsS "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL secret is not set."
+            echo "Add it in GitHub: Settings → Secrets and variables → Actions."
+            echo "Value: Render → poke-mcp → Settings → Deploy Hook."
+            exit 1
+          fi
+          curl -fsS "$DEPLOY_HOOK_URL"

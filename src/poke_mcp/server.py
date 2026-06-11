@@ -15,10 +15,12 @@ from poke_mcp.clients.supabase_client import build_supabase_client
 from poke_mcp.config import Settings, get_settings
 from poke_mcp.services.dashboard_service import DashboardService
 from poke_mcp.services.habittracker_service import HabitTrackerService
+from poke_mcp.services.metrics_service import MetricsService
 from poke_mcp.tools.blocked_tools import register_blocked_tools
 from poke_mcp.tools.dashboard_tools import register_dashboard_tools
 from poke_mcp.tools.habittracker_tools import register_habittracker_tools
 from poke_mcp.tools.health_tools import build_health_payload, register_health_tools
+from poke_mcp.tools.metrics_tools import register_metrics_tools
 
 logger = logging.getLogger(__name__)
 
@@ -61,9 +63,18 @@ def create_mcp(
     def dashboard_service_factory() -> DashboardService:
         return DashboardService(habittracker_service_factory())
 
+    def metrics_service_factory() -> MetricsService:
+        client = supabase_client or build_supabase_client(resolved_settings)
+        return MetricsService(
+            client,
+            resolved_settings,
+            today_provider=today_provider,
+        )
+
     register_health_tools(mcp, resolved_settings)
     register_habittracker_tools(mcp, habittracker_service_factory)
     register_dashboard_tools(mcp, dashboard_service_factory)
+    register_metrics_tools(mcp, metrics_service_factory)
     register_blocked_tools(mcp)
 
     @mcp.custom_route("/health", methods=["GET"])

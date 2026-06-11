@@ -23,6 +23,10 @@ EXPECTED_TOOLS = {
     "complete_habit",
     "uncomplete_habit",
     "get_today_dashboard",
+    "get_latest_body_weight",
+    "get_body_weight_history",
+    "get_body_weight_trend",
+    "get_metric_summary",
 }
 
 
