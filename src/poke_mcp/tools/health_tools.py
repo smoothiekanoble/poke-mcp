@@ -16,7 +16,7 @@ def build_health_payload(settings: Settings) -> dict[str, Any]:
         "supabase_configured": settings.supabase_configured,
         "google_calendar_configured": settings.google_calendar_configured,
         "api_key_configured": api_key_configured(settings),
-        "enabled_tool_groups": ["health", "habittracker", "dashboard", "metrics"],
+        "enabled_tool_groups": ["health", "habittracker", "dashboard"],
         "blocked_tool_groups": ["tasks", "checkins", "calendar"],
     }
 
