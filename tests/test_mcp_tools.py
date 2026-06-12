@@ -47,6 +47,14 @@ async def test_mcp_registers_health_and_habit_tool() -> None:
             "get_body_weight_trend",
             "get_metric_summary",
         } <= names
+        # Task/check-in concepts are not part of this MCP surface; exposing
+        # always-blocked stubs confused MCP clients into misdiagnosing the server.
+        assert not names & {
+            "list_today_tasks",
+            "create_task",
+            "complete_task",
+            "log_daily_checkin",
+        }
 
         health = await client.call_tool("health", {})
         habits = await client.call_tool("list_today_habits", {})

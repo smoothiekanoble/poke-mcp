@@ -16,7 +16,6 @@ from poke_mcp.config import Settings, get_settings
 from poke_mcp.services.dashboard_service import DashboardService
 from poke_mcp.services.habittracker_service import HabitTrackerService
 from poke_mcp.services.metrics_service import MetricsService
-from poke_mcp.tools.blocked_tools import register_blocked_tools
 from poke_mcp.tools.dashboard_tools import register_dashboard_tools
 from poke_mcp.tools.habittracker_tools import register_habittracker_tools
 from poke_mcp.tools.health_tools import build_health_payload, register_health_tools
@@ -75,7 +74,6 @@ def create_mcp(
     register_habittracker_tools(mcp, habittracker_service_factory)
     register_dashboard_tools(mcp, dashboard_service_factory)
     register_metrics_tools(mcp, metrics_service_factory)
-    register_blocked_tools(mcp)
 
     @mcp.custom_route("/health", methods=["GET"])
     async def http_health(request: Request) -> JSONResponse:

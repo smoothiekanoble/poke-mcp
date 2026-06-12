@@ -92,7 +92,7 @@ No HabitTracker tables were found for:
 - readiness
 - health logs
 
-Task and check-in MCP tools should remain graceful blocked responses until HabitTracker owns those schemas.
+Task and check-in MCP tools are not registered at all. Exposing always-blocked stub tools caused MCP clients (Poke) to misdiagnose the server, so the surface only contains tools that work. Add task/check-in tools only after HabitTracker owns those schemas.
 
 ## MVP Decision
 

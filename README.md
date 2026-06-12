@@ -23,7 +23,9 @@ HabitTracker remains the source of truth. This server does not add API routes to
 - `complete_habit(habit_name)`: marks today's matching habit complete.
 - `uncomplete_habit(habit_name)`: marks today's matching habit incomplete without deleting rows.
 - `get_today_dashboard()`: returns completed/incomplete habit summary for today.
-- Task and check-in tools return blocked responses until HabitTracker has those schemas.
+- Body-weight metric tools (`get_latest_body_weight`, `get_body_weight_history`, `get_body_weight_trend`, `get_metric_summary`) read imported `daily_metrics`/`metric_events` data.
+
+Tasks and check-ins are not part of the current MCP surface. HabitTracker is habits-first and has no task concept; those tools will only be added if HabitTracker gains the schemas.
 
 ## Environment
 
@@ -256,8 +258,7 @@ Active habits are those where `active_from <= today` and `active_until` is null 
 
 ## Known Limitations
 
-- No task tools until HabitTracker gets a task table.
-- No check-in tools until HabitTracker gets a daily check-in or health-log table.
+- Task and check-in tools are intentionally not registered; HabitTracker has no task or check-in schema.
 - No Google Calendar integration in this MVP.
 - `uncomplete_habit` upserts `completed=false`; HabitTracker web currently often represents incomplete as no log row.
 - Production remote auth should be finalized when Poke custom integration requirements are known.

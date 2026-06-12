@@ -17,7 +17,7 @@ def build_health_payload(settings: Settings) -> dict[str, Any]:
         "google_calendar_configured": settings.google_calendar_configured,
         "api_key_configured": api_key_configured(settings),
         "enabled_tool_groups": ["health", "habittracker", "dashboard"],
-        "blocked_tool_groups": ["tasks", "checkins", "calendar"],
+        "future_tool_groups": ["tasks", "checkins", "calendar"],
     }
 
 

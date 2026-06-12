@@ -26,7 +26,7 @@ The current MVP is habit tracking first:
 - Mark a habit incomplete for today without deleting rows.
 - Return today's habit dashboard.
 
-Tasks, check-ins, and calendar integration are future work after explicit schema/integration setup.
+Tasks, check-ins, and calendar integration are future work after explicit schema/integration setup. Do not register placeholder/stub tools for them; only working tools belong in the MCP surface (always-"blocked" stubs caused Poke to misdiagnose the server).
 
 ## Commands
 
